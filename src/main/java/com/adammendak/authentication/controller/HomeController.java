@@ -1,14 +1,20 @@
 package com.adammendak.authentication.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController(value = "/")
+import java.util.Date;
+
+@RestController()
+@RequestMapping(path = "/")
+@CorsFilter
 public class HomeController {
 
-    @GetMapping
+    @GetMapping()
     public String home() {
-        return "works";
+        Date time = new Date();
+        return "Server works: " + time.toString();
     }
 
 }
