@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
-@RequestMapping( value = "/api", produces = MediaType.APPLICATION_JSON_VALUE )
+@RequestMapping( value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE )
 @Slf4j
 public class UserController {
 
@@ -25,7 +25,7 @@ public class UserController {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @PostMapping("/signUp")
+    @PostMapping()
     public void signUp(@RequestBody UserDto userDto) {
 
         User newUser = UserMapperImpl.INSTANCE.userDtoToUser(userDto);
