@@ -4,6 +4,7 @@ import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.model.dto.UserDto;
 import com.adammendak.authentication.model.mapper.UserMapperImpl;
 import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.service.UserDetailServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

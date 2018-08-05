@@ -5,12 +5,17 @@ import com.adammendak.authentication.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.ApplicationScope;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,19 +25,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+@PropertySource("classpath:application.properties")
+@ConfigurationProperties
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    @Autowired
+    private ConfigHelper configHelper;
+
     @Value("${jwt.expiration_time}")
-    private final Long EXPIRATION_TIME;
+    private Long EXPIRATION_TIME = 864000000L;
 
     @Value("${jwt.secret}")
-    private final String SECRET;
+    private String SECRET = "verySecretSecret";
 
     @Value("${jwt.header_string}")
-    private final String HEADER_STRING;
+    private String HEADER_STRING = "Authentication";
 
     @Value("${jwt.token_prefix}")
-    private final String TOKEN_PREFIX;
+    private String TOKEN_PREFIX = "Bearer";
 
     private AuthenticationManager authenticationManager;
 

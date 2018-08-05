@@ -12,6 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SpringBootApplication
 public class AuthenticationApplication {
 
+    //todo sprawdzic co sie dzieje i poprawic @Value zeby dzialalo
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
@@ -24,13 +26,13 @@ public class AuthenticationApplication {
     }
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
-        return new PropertySourcesPlaceholderConfigurer();
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     public static void main(String[] args) {
