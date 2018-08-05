@@ -5,6 +5,7 @@ import com.adammendak.authentication.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Profile(value = "dev")
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Component;
 public class Bootstrap implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public Bootstrap(UserRepository userRepository) {
+    public Bootstrap(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -23,8 +26,8 @@ public class Bootstrap implements CommandLineRunner {
 
         User testUser = new User();
         testUser.setId(1L);
-        testUser.setLogin("testowyLogin");
-        testUser.setPassword("test123");
+        testUser.setLogin("test");
+        testUser.setPassword(bCryptPasswordEncoder.encode("test"));
 
         userRepository.save(testUser);
         log.info("added testUser login: {} password {}", testUser.getLogin(), testUser.getPassword());
