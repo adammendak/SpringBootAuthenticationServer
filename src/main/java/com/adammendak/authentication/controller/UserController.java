@@ -6,6 +6,8 @@ import com.adammendak.authentication.model.mapper.UserMapperImpl;
 import com.adammendak.authentication.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,12 @@ public class UserController {
     public UserController(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    @GetMapping("/getInfo")
+    public ResponseEntity<?> getUserInfo(UsernamePasswordAuthenticationToken userToken) {
+        log.info("userToken {} ", userToken.toString());
+        return ResponseEntity.ok().body("test uesr info");
     }
 
     @PostMapping
