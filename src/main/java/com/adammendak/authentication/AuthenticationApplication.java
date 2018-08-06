@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class AuthenticationApplication {
 
     //todo sprawdzic co sie dzieje i poprawic @Value zeby dzialalo
-
+    //todo zrobic exception mappinga jakiegos generycznego
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
