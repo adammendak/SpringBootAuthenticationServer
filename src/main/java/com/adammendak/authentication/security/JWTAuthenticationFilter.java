@@ -1,6 +1,5 @@
 package com.adammendak.authentication.security;
 
-
 import com.adammendak.authentication.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
@@ -13,9 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.ApplicationScope;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,7 +24,7 @@ import java.util.Date;
 
 @PropertySource("classpath:application.properties")
 @ConfigurationProperties
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     @Autowired
     private ConfigHelper configHelper;
@@ -42,11 +39,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String HEADER_STRING = "Authentication";
 
     @Value("${jwt.token_prefix}")
-    private String TOKEN_PREFIX = "Bearer";
+    private String TOKEN_PREFIX = "Bearer ";
 
     private AuthenticationManager authenticationManager;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JWTAuthenticationFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager) {
+        super(defaultFilterProcessesUrl);
         this.authenticationManager = authenticationManager;
     }
 
@@ -73,7 +71,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
         String token = Jwts.builder()
-                .setSubject(((User) auth.getPrincipal()).getLogin())
+                .setSubject(((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();

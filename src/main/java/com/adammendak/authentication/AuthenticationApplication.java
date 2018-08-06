@@ -20,7 +20,7 @@ public class AuthenticationApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+                        .allowedMethods("HEAD", "OPTIONS", "GET", "PUT", "POST", "DELETE", "PATCH");
             }
         };
     }
