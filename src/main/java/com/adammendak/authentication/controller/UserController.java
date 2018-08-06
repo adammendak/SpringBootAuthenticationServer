@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController()
 @RequestMapping( value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE )
 @Slf4j
@@ -25,9 +27,16 @@ public class UserController {
     }
 
     @GetMapping("/getInfo")
-    public ResponseEntity<?> getUserInfo(UsernamePasswordAuthenticationToken userToken) {
+    public ResponseEntity<?> getUserInfo(UsernamePasswordAuthenticationToken userToken) throws Exception{
         log.info("userToken {} ", userToken.toString());
-        return ResponseEntity.ok().body("test uesr info");
+        Optional<User> userFromDB = userRepository.findByLogin(userToken.getPrincipal().toString());
+
+        if(userFromDB.isPresent()) {
+
+            return ResponseEntity.ok().body(UserMapperImpl.INSTANCE.userToUserDto(userFromDB.get()));
+        } else {
+            throw new Exception("there is no such user in DB");
+        }
     }
 
     @PostMapping

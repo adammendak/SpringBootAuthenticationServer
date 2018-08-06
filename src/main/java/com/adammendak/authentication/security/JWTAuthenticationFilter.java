@@ -26,9 +26,6 @@ import java.util.Date;
 @ConfigurationProperties
 public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    @Autowired
-    private ConfigHelper configHelper;
-
     @Value("${jwt.expiration_time}")
     private Long EXPIRATION_TIME = 864000000L;
 
