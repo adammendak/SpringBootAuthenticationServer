@@ -47,6 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //todo sprawdzic czy cors tutaj zadziala czy trzeba w chainie dodac
         http.cors().and()
                 .csrf().disable().authorizeRequests()
+                .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, LOGIN_URL).permitAll()
                 .antMatchers(HttpMethod.POST, CREATE_NEW_USER_URL).permitAll()
                 .anyRequest().authenticated()
