@@ -46,19 +46,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //todo sprawdzic czy cors tutaj zadziala czy trzeba w chainie dodac
-        http.cors().and()
-                .csrf().disable().authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/actuator/health").permitAll()
-                .antMatchers("/actuator/info").permitAll()
-                .antMatchers(HttpMethod.POST, LOGIN_URL).permitAll()
-                .antMatchers(HttpMethod.POST, CREATE_NEW_USER_URL).permitAll()
-//                .antMatchers("/api").hasRole("ROLE_USER")
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()));
+        http
+            .cors().and()
+            .csrf().disable()
+            .authorizeRequests()
+            .antMatchers("/h2-console/**").permitAll()
+            .antMatchers("/").permitAll()
+            .antMatchers("/actuator/health").permitAll()
+            .antMatchers("/actuator/info").permitAll()
+            .antMatchers(HttpMethod.POST, LOGIN_URL).permitAll()
+            .antMatchers(HttpMethod.POST, CREATE_NEW_USER_URL).permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+            .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+            .headers().frameOptions().disable();
     }
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {

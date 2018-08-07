@@ -26,6 +26,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByLogin(login);
         if( user.isPresent()) {
+            //todo tutaj zmienic zeby byly role usera wziete a nie pusta kolekcja bo cos nie dziala za bardzo
             return new org.springframework.security.core.userdetails.User (user.get().getLogin(),
                     user.get().getPassword(), Collections.emptyList());
         } else {

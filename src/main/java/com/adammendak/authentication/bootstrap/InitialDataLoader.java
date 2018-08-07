@@ -6,6 +6,7 @@ import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.PrivilegeRepository;
 import com.adammendak.authentication.repository.RoleRepository;
 import com.adammendak.authentication.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
+@Slf4j
 @Profile(value = "dev")
 public class InitialDataLoader implements
         ApplicationListener<ContextRefreshedEvent> {
@@ -58,6 +60,7 @@ public class InitialDataLoader implements
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
 
         User user = new User();
+        user.setId(2L);
         user.setFirstName("Test");
         user.setLastName("Test");
         user.setPassword(passwordEncoder.encode("test"));
@@ -65,6 +68,7 @@ public class InitialDataLoader implements
         user.setRoles(Arrays.asList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);
+        log.info("user from initialDataLoader: {}", user.toString());
 
         alreadySetup = true;
     }
