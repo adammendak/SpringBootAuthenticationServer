@@ -57,18 +57,18 @@ public class InitialDataLoader implements
         createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
         createRoleIfNotFound("ROLE_USER", Arrays.asList(readPrivilege));
 
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+//        Role adminRole = roleRepository.findByName("ROLE_ADMIN");
 
-        User user = new User();
-        user.setId(2L);
-        user.setFirstName("Test");
-        user.setLastName("Test");
-        user.setPassword(passwordEncoder.encode("test"));
-        user.setEmail("test@test.com");
-        user.setRoles(Arrays.asList(adminRole));
-        user.setEnabled(true);
-        userRepository.save(user);
-        log.info("user from initialDataLoader: {}", user.toString());
+//        User user = new User();
+//        user.setId(2L);
+//        user.setFirstName("Test");
+//        user.setLastName("Test");
+//        user.setPassword(passwordEncoder.encode("test"));
+//        user.setEmail("test@test.com");
+//        user.setRoles(Arrays.asList(adminRole));
+//        user.setEnabled(true);
+//        userRepository.save(user);
+//        log.info("user from initialDataLoader: {}", user.toString());
 
         alreadySetup = true;
     }

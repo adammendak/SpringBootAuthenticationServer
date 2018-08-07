@@ -1,8 +1,11 @@
 package com.adammendak.authentication.service;
 
+import com.adammendak.authentication.model.Role;
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,20 +20,40 @@ import java.util.*;
 public class UserDetailServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final SecurityService securityService;
 
-    public UserDetailServiceImpl(UserRepository userRepository) {
+    public UserDetailServiceImpl(UserRepository userRepository, SecurityService securityService) {
         this.userRepository = userRepository;
+        this.securityService = securityService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByLogin(login);
         if( user.isPresent()) {
-            //todo tutaj zmienic zeby byly role usera wziete a nie pusta kolekcja bo cos nie dziala za bardzo
             return new org.springframework.security.core.userdetails.User (user.get().getLogin(),
-                    user.get().getPassword(), Collections.emptyList());
+//todo tutaj jest to przekombinowane
+//                    user.get().getPassword(), securityService.getAuthorities(user.get().getRoles()));
+                    user.get().getPassword(), getAuthorities(user.get().getRoles()));
         } else {
             throw new UsernameNotFoundException(login);
         }
+
     }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(
+            Collection<Role> roles) {
+        List<GrantedAuthority> authorities
+                = new ArrayList<>();
+        for (Role role: roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+            role.getPrivileges().stream()
+                    .map(p -> new SimpleGrantedAuthority(p.getName()))
+                    .forEach(authorities::add);
+        }
+
+        return authorities;
+    }
+
 }
+

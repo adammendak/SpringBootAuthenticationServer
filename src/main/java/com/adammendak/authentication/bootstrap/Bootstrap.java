@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 
 @Profile(value = "dev")
@@ -28,14 +29,17 @@ public class Bootstrap implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
 
         User testUser = new User();
         testUser.setId(1L);
         testUser.setLogin("test");
+        testUser.setEnabled(Boolean.TRUE);
         testUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
         testUser.setPassword(bCryptPasswordEncoder.encode("test"));
         userRepository.save(testUser);
-        log.info("added testUser login: {} password {}", testUser.getLogin(), testUser.getPassword());
+        log.info("added testUser login: {} password {} granted roles contain USER_ROLE : {}", testUser.getLogin(), testUser.getPassword(),
+                testUser.getRoles().contains(roleRepository.findByName("ROLE_USER")));
     }
 }

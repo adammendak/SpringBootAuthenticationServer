@@ -1,10 +1,12 @@
 package com.adammendak.authentication.security;
 
+import com.adammendak.authentication.model.Role;
 import com.adammendak.authentication.model.User;
+import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.service.SecurityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
@@ -12,6 +14,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import javax.servlet.FilterChain;
@@ -19,8 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 @PropertySource("classpath:application.properties")
 @ConfigurationProperties
@@ -39,10 +42,15 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     private String TOKEN_PREFIX = "Bearer ";
 
     private AuthenticationManager authenticationManager;
+    private SecurityService securityService;
+    private UserRepository userRepository;
 
-    public JWTAuthenticationFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager) {
+    public JWTAuthenticationFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager
+        ,SecurityService securityService, UserRepository userRepository) {
         super(defaultFilterProcessesUrl);
         this.authenticationManager = authenticationManager;
+        this.securityService = securityService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -51,11 +59,19 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
         try {
             User credentials = new ObjectMapper()
                     .readValue(request.getInputStream(), User.class);
+            Optional<User> userFromReq = userRepository.findByLogin(credentials.getLogin());
+            Collection<? extends GrantedAuthority> authorities = new ArrayList<>();
+//            if(userFromReq.isPresent()) {
+//                authorities = securityService.getAuthorities(userFromReq.get().getRoles());
+//            }
+
+
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             credentials.getLogin(),
                             credentials.getPassword(),
-                            new ArrayList<>())
+                            //todo tutaj wczesniej bylo to co na gorze zakomentowane
+                            getAuthorities(userFromReq.get().getRoles()))
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -74,4 +90,19 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .compact();
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
     }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(
+            Collection<Role> roles) {
+        List<GrantedAuthority> authorities
+                = new ArrayList<>();
+        for (Role role: roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+            role.getPrivileges().stream()
+                    .map(p -> new SimpleGrantedAuthority(p.getName()))
+                    .forEach(authorities::add);
+        }
+
+        return authorities;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.adammendak.authentication.security;
 
+import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.service.SecurityService;
 import com.adammendak.authentication.service.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,6 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,12 +22,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+
 @PropertySource("classpath:application.properties")
 @ConfigurationProperties
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsService userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private SecurityService securityService;
+    private UserRepository userRepository;
 
     @Value("${jwt.login_url}")
     private String LOGIN_URL = "/auth/login";
@@ -32,9 +39,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${jwt.create_new_user_url}")
     private String CREATE_NEW_USER_URL = "/api/user";
 
-    public WebSecurityConfig(UserDetailServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public WebSecurityConfig(UserDetailServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder
+        ,SecurityService securityService, UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.securityService = securityService;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -42,7 +52,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -58,8 +67,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, CREATE_NEW_USER_URL).permitAll()
             .anyRequest().authenticated()
             .and()
-            .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-            .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+            .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager(),
+                    securityService, userRepository), UsernamePasswordAuthenticationFilter.class)
+            .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityService, userRepository))
             .headers().frameOptions().disable();
     }
     @Override
