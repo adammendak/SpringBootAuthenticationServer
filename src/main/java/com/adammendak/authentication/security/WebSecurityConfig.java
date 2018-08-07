@@ -54,6 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/actuator/info").permitAll()
                 .antMatchers(HttpMethod.POST, LOGIN_URL).permitAll()
                 .antMatchers(HttpMethod.POST, CREATE_NEW_USER_URL).permitAll()
+//                .antMatchers("/api").hasRole("ROLE_USER")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager()), UsernamePasswordAuthenticationFilter.class)

@@ -7,6 +7,7 @@ import com.adammendak.authentication.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class UserController {
     }
 
     @GetMapping("/getInfo")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<?> getUserInfo(UsernamePasswordAuthenticationToken userToken) throws Exception{
         log.info("userToken {} ", userToken.toString());
         Optional<User> userFromDB = userRepository.findByLogin(userToken.getPrincipal().toString());

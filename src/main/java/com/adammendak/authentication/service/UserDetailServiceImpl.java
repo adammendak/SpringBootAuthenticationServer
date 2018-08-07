@@ -7,11 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
-import java.util.Optional;
+
+import javax.transaction.Transactional;
+import java.util.*;
 
 @Service
 @Slf4j
+@Transactional
 public class UserDetailServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;

@@ -14,6 +14,7 @@ public class AuthenticationApplication {
 
     //todo sprawdzic co sie dzieje i poprawic @Value zeby dzialalo
     //todo zrobic exception mappinga jakiegos generycznego
+    //todo zrobic enumy z role i privilegesow
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
