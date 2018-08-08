@@ -70,6 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager(),
                     securityService, userRepository), UsernamePasswordAuthenticationFilter.class)
             .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityService, userRepository))
+                //potrzebny do przegladania h2-console
             .headers().frameOptions().disable();
     }
     @Override

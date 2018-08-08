@@ -4,10 +4,8 @@ import com.adammendak.authentication.model.Role;
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.model.dto.UserDto;
 import com.adammendak.authentication.model.mapper.UserMapperImpl;
-import com.adammendak.authentication.repository.PrivilegeRepository;
 import com.adammendak.authentication.repository.RoleRepository;
 import com.adammendak.authentication.repository.UserRepository;
-import com.adammendak.authentication.service.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,23 +27,18 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final PrivilegeRepository privilegeRepository;
-    private final SecurityService securityService;
     private final RoleRepository roleRepository;
 
     public UserController(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-                          PrivilegeRepository privilegeRepository, SecurityService securityService,
                           RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.privilegeRepository = privilegeRepository;
-        this.securityService = securityService;
         this.roleRepository = roleRepository;
     }
 
     @GetMapping("/getInfo")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> getUserInfo(UsernamePasswordAuthenticationToken userToken) throws Exception{
+    public ResponseEntity<?> getUserInfo(UsernamePasswordAuthenticationToken userToken) {
         Optional<User> userFromDB = userRepository.findByLogin(userToken.getPrincipal().toString());
         if (userHasPermissionToRead()) {
             return ResponseEntity.ok().body(UserMapperImpl.INSTANCE.userToUserDto(userFromDB.get()));
