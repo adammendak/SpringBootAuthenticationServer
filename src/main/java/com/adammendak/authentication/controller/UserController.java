@@ -1,6 +1,5 @@
 package com.adammendak.authentication.controller;
 
-import com.adammendak.authentication.model.Privilege;
 import com.adammendak.authentication.model.Role;
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.model.dto.UserDto;
@@ -18,15 +17,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 
 @RestController()
 @RequestMapping( value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE )
 @Slf4j
 public class UserController {
+
+    private final String ROLE_USER = "ROLE_USER";
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -61,7 +60,7 @@ public class UserController {
         User newUser = UserMapperImpl.INSTANCE.userDtoToUser(userDto);
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         try {
-            newUser.setRoles(Arrays.asList(new Role("USER")));
+            newUser.setRoles(Arrays.asList(new Role(ROLE_USER)));
             User savedUser = userRepository.save(newUser);
             log.info("new user with id {} and login {}", savedUser.getId(), savedUser.getLogin());
         } catch (Exception e){
@@ -71,15 +70,13 @@ public class UserController {
 
     private Boolean userHasPermissionToRead( ) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        log.info("ASDASDAD{}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        log.info("User Permissions{}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
         Optional<User> userToCheck = userRepository.findByLogin(username);
-        if(userToCheck.isPresent()){
-            Role userRole = roleRepository.findByName("ROLE_USER");
-            if(userToCheck.get().getRoles().contains(userRole)) {
-                return Boolean.TRUE;
-            } else {
-                return Boolean.FALSE;
-            }
+        Role userRole = roleRepository.findByName(ROLE_USER);
+
+        if(userToCheck.get().getRoles().contains(userRole)) {
+            return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }

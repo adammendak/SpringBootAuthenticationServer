@@ -60,18 +60,15 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
             User credentials = new ObjectMapper()
                     .readValue(request.getInputStream(), User.class);
             Optional<User> userFromReq = userRepository.findByLogin(credentials.getLogin());
-            Collection<? extends GrantedAuthority> authorities = new ArrayList<>();
-//            if(userFromReq.isPresent()) {
-//                authorities = securityService.getAuthorities(userFromReq.get().getRoles());
-//            }
-
+            if(!userFromReq.isPresent()) {
+                throw new Error("no such user in DB");
+            }
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             credentials.getLogin(),
                             credentials.getPassword(),
-                            //todo tutaj wczesniej bylo to co na gorze zakomentowane
-                            getAuthorities(userFromReq.get().getRoles()))
+                            securityService.getAuthorities(userFromReq.get().getRoles()))
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -90,19 +87,4 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .compact();
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
     }
-
-    private Collection<? extends GrantedAuthority> getAuthorities(
-            Collection<Role> roles) {
-        List<GrantedAuthority> authorities
-                = new ArrayList<>();
-        for (Role role: roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-            role.getPrivileges().stream()
-                    .map(p -> new SimpleGrantedAuthority(p.getName()))
-                    .forEach(authorities::add);
-        }
-
-        return authorities;
-    }
-
 }

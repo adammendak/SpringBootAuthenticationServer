@@ -1,6 +1,5 @@
 package com.adammendak.authentication.security;
 
-import com.adammendak.authentication.model.Role;
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
 import com.adammendak.authentication.service.SecurityService;
@@ -11,8 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -21,9 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @PropertySource("classpath:application.properties")
@@ -40,7 +34,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Value("${jwt.secret}")
     private String SECRET = "verySecretSecret" ;
 
-//    private JwtTokenUtil jwtTokenUtil;
     private SecurityService securityService;
     private UserRepository userRepository;
 
@@ -73,36 +66,11 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     .getBody()
                     .getSubject();
             if (user != null) {
-                //todo tutaj trzeba USTAWIC !!!
-                Optional<User> user1 = userRepository.findByLogin(user);
-//                user1.ifPresent(user2 -> log.info("###########UDALO SIE TO JEST USER {}", user2.getLogin()));
-//                userRepository.findByLogin(user.)
-//                Collection<GrantedAuthority> grantedAuthorities = securityService.getAuthorities(user)
-//                Collection<GrantedAuthority> grantedAuthorities = securityService.getAuthorities(user1.get().getRoles());
-
-
-
-
-                return new UsernamePasswordAuthenticationToken(user, user1.get(), getAuthorities(user1.get().getRoles()) );
+                Optional<User> userInDB = userRepository.findByLogin(user);
+                return new UsernamePasswordAuthenticationToken(user, userInDB.get(), securityService.getAuthorities(userInDB.get().getRoles()) );
             }
             return null;
         }
         return null;
     }
-
-
-    private Collection<? extends GrantedAuthority> getAuthorities(
-            Collection<Role> roles) {
-        List<GrantedAuthority> authorities
-                = new ArrayList<>();
-        for (Role role: roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-            role.getPrivileges().stream()
-                    .map(p -> new SimpleGrantedAuthority(p.getName()))
-                    .forEach(authorities::add);
-        }
-
-        return authorities;
-    }
-
 }

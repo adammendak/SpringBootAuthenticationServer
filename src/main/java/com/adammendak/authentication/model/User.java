@@ -16,30 +16,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @NotNull
+    @NotNull
     @Column(name = "login")
     private String login;
 
-//    @NotNull
+    @NotNull
     @Column(name = "password")
     private String password;
 
-//    @NotNull
+    @NotNull
     @Column(name = "first_name")
     private String firstName;
 
-//    @NotNull
+    @NotNull
     @Column(name = "last_name")
     private String lastName;
 
-//    @NotNull
+    @NotNull
     @Column(name = "email")
     private String email;
 
     @Column(name = "enabled")
     private boolean enabled;
 
-    //todo implement this shit
     @Column(name = "token_expired")
     private boolean tokenExpired;
 
