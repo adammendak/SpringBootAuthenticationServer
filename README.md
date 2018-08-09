@@ -1,2 +1,2 @@
 # SpringBootAuthenticationServer
-authentication server for react front app oevr here http://login.adammendak.pl/
+authentication server for react front app over here http://login.adammendak.pl/
