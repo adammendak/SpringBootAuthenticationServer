@@ -1,8 +1,6 @@
 package com.adammendak.authentication.security;
 
 import com.adammendak.authentication.repository.UserRepository;
-import com.adammendak.authentication.service.SecurityService;
-import com.adammendak.authentication.service.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsService userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private SecurityService securityService;
+    private SecurityUtil securityUtil;
     private UserRepository userRepository;
 
     @Value("${jwt.login_url}")
@@ -40,10 +38,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String CREATE_NEW_USER_URL = "/api/user";
 
     public WebSecurityConfig(UserDetailServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder
-        ,SecurityService securityService, UserRepository userRepository) {
+        , SecurityUtil securityUtil, UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.securityService = securityService;
+        this.securityUtil = securityUtil;
         this.userRepository = userRepository;
     }
 
@@ -68,8 +66,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().authenticated()
             .and()
             .addFilterBefore( new JWTAuthenticationFilter(LOGIN_URL , authenticationManager(),
-                    securityService, userRepository), UsernamePasswordAuthenticationFilter.class)
-            .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityService, userRepository))
+                    securityUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
+            .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityUtil, userRepository))
                 //potrzebny do przegladania h2-console
             .headers().frameOptions().disable();
     }

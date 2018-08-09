@@ -2,12 +2,8 @@ package com.adammendak.authentication.security;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
-import com.adammendak.authentication.service.SecurityService;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,28 +16,26 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-@PropertySource("classpath:application.properties")
-@ConfigurationProperties
 @Slf4j
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    @Value("${jwt.header_string}")
-    private String HEADER_STRING = "Authorization";
-
-    @Value("${jwt.token_prefix}")
-    private String TOKEN_PREFIX = "Bearer";
-
-    @Value("${jwt.secret}")
-    private String SECRET = "verySecretSecret" ;
-
-    private SecurityService securityService;
+    private SecurityUtil securityUtil;
     private UserRepository userRepository;
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager, SecurityService securityService,
+    private String HEADER_STRING;
+    private String TOKEN_PREFIX;
+    private String SECRET;
+
+
+
+    public JWTAuthorizationFilter(AuthenticationManager authenticationManager, SecurityUtil securityUtil,
                                   UserRepository userRepository) {
         super(authenticationManager);
-        this.securityService = securityService;
+        this.securityUtil = securityUtil;
         this.userRepository = userRepository;
+        this.HEADER_STRING = securityUtil.getHEADER_STRING();
+        this.TOKEN_PREFIX = securityUtil.getTOKEN_PREFIX();
+        this.SECRET = securityUtil.getSECRET();
     }
 
     @Override
@@ -67,7 +61,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     .getSubject();
             if (user != null) {
                 Optional<User> userInDB = userRepository.findByLogin(user);
-                return new UsernamePasswordAuthenticationToken(user, userInDB.get(), securityService.getAuthorities(userInDB.get().getRoles()) );
+                return new UsernamePasswordAuthenticationToken(user, userInDB.get(), securityUtil.getAuthorities(userInDB.get().getRoles()) );
             }
             return null;
         }

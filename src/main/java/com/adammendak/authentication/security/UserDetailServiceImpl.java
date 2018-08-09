@@ -1,7 +1,8 @@
-package com.adammendak.authentication.service;
+package com.adammendak.authentication.security;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.security.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,11 +18,11 @@ import java.util.*;
 public class UserDetailServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final SecurityService securityService;
+    private final SecurityUtil securityUtil;
 
-    public UserDetailServiceImpl(UserRepository userRepository, SecurityService securityService) {
+    public UserDetailServiceImpl(UserRepository userRepository, SecurityUtil securityUtil) {
         this.userRepository = userRepository;
-        this.securityService = securityService;
+        this.securityUtil = securityUtil;
     }
 
     @Override
@@ -29,7 +30,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         Optional<User> user = userRepository.findByLogin(login);
         if( user.isPresent()) {
             return new org.springframework.security.core.userdetails.User (user.get().getLogin(),
-                    user.get().getPassword(), securityService.getAuthorities(user.get().getRoles()));
+                    user.get().getPassword(), securityUtil.getAuthorities(user.get().getRoles()));
         } else {
             throw new UsernameNotFoundException(login);
         }

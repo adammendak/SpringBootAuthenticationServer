@@ -2,13 +2,10 @@ package com.adammendak.authentication.security;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
-import com.adammendak.authentication.service.SecurityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,31 +19,27 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-@PropertySource("classpath:application.properties")
-@ConfigurationProperties
+@Slf4j
 public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    @Value("${jwt.expiration_time}")
-    private Long EXPIRATION_TIME = 864000000L;
-
-    @Value("${jwt.secret}")
-    private String SECRET = "verySecretSecret";
-
-    @Value("${jwt.header_string}")
-    private String HEADER_STRING = "Authentication";
-
-    @Value("${jwt.token_prefix}")
-    private String TOKEN_PREFIX = "Bearer ";
-
     private AuthenticationManager authenticationManager;
-    private SecurityService securityService;
+    private SecurityUtil securityUtil;
     private UserRepository userRepository;
 
-    public JWTAuthenticationFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager
-        ,SecurityService securityService, UserRepository userRepository) {
+    private Long EXPIRATION_TIME;
+    private String SECRET;
+    private String HEADER_STRING;
+    private String TOKEN_PREFIX;
+
+    public JWTAuthenticationFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager,
+                                   SecurityUtil securityUtil, UserRepository userRepository) {
         super(defaultFilterProcessesUrl);
+        this.EXPIRATION_TIME = securityUtil.getEXPIRATION_TIME();
+        this.SECRET = securityUtil.getSECRET();
+        this.HEADER_STRING = securityUtil.getHEADER_STRING();
+        this.TOKEN_PREFIX = securityUtil.getTOKEN_PREFIX();
         this.authenticationManager = authenticationManager;
-        this.securityService = securityService;
+        this.securityUtil = securityUtil;
         this.userRepository = userRepository;
     }
 
@@ -65,7 +58,7 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                     new UsernamePasswordAuthenticationToken(
                             credentials.getLogin(),
                             credentials.getPassword(),
-                            securityService.getAuthorities(userFromReq.get().getRoles()))
+                            securityUtil.getAuthorities(userFromReq.get().getRoles()))
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -82,6 +75,6 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+        res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + token);
     }
 }

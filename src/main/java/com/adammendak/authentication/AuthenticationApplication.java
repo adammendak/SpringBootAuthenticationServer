@@ -12,9 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SpringBootApplication
 public class AuthenticationApplication {
 
-    //todo sprawdzic co sie dzieje i poprawic @Value zeby dzialalo
+    //todo sprawdzic na froncie czy odpowiedni token w headerach authorization czy authentication leci
     //todo custom exception handler
-    //todo property config najbardziej boli
     // todo jwt token utils implement
     //todo zrobic exception mappinga jakiegos generycznego
     //todo zrobic enumy z role i privilegesow
