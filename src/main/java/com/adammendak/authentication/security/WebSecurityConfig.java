@@ -1,6 +1,8 @@
 package com.adammendak.authentication.security;
 
 import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.security.filter.JWTAuthenticationFilter;
+import com.adammendak.authentication.security.filter.JWTAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;

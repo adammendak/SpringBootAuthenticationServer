@@ -1,7 +1,8 @@
-package com.adammendak.authentication.security;
+package com.adammendak.authentication.security.filter;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.security.SecurityUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import javax.servlet.FilterChain;
@@ -44,14 +46,15 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException {
 
         try {
             User credentials = new ObjectMapper()
                     .readValue(request.getInputStream(), User.class);
             Optional<User> userFromReq = userRepository.findByLogin(credentials.getLogin());
-            if(!userFromReq.isPresent()) {
-                throw new Error("no such user in DB");
+            if (!userFromReq.isPresent()) {
+                throw new UsernameNotFoundException("no such user in DB");
             }
 
             return authenticationManager.authenticate(
@@ -62,6 +65,8 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new UsernameNotFoundException(e.getMessage());
         }
     }
 

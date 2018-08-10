@@ -1,7 +1,8 @@
-package com.adammendak.authentication.security;
+package com.adammendak.authentication.security.filter;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
+import com.adammendak.authentication.security.SecurityUtil;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
