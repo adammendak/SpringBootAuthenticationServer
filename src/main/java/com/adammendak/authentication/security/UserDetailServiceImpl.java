@@ -2,7 +2,6 @@ package com.adammendak.authentication.security;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
-import com.adammendak.authentication.security.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
