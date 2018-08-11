@@ -29,6 +29,12 @@ public class SecurityUtil {
     @Value("${jwt.expiration_time}")
     private Long EXPIRATION_TIME;
 
+    @Value("${jwt.login_url}")
+    private String LOGIN_URL = "/auth/login";
+
+    @Value("${jwt.create_new_user_url}")
+    private String CREATE_NEW_USER_URL = "/api/user";
+
     public Collection<? extends GrantedAuthority> getAuthorities(
             Collection<Role> roles) {
         List<GrantedAuthority> authorities

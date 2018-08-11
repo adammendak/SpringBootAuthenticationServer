@@ -1,4 +1,4 @@
-package com.adammendak.authentication.security.filter;
+package com.adammendak.authentication.security.filters;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

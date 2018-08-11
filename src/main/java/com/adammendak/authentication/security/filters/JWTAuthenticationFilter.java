@@ -1,4 +1,4 @@
-package com.adammendak.authentication.security.filter;
+package com.adammendak.authentication.security.filters;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
@@ -65,8 +65,6 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new UsernameNotFoundException(e.getMessage());
         }
     }
 

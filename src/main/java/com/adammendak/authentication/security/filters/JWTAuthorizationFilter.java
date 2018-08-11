@@ -1,4 +1,4 @@
-package com.adammendak.authentication.security.filter;
+package com.adammendak.authentication.security.filters;
 
 import com.adammendak.authentication.model.User;
 import com.adammendak.authentication.repository.UserRepository;
@@ -26,8 +26,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private String HEADER_STRING;
     private String TOKEN_PREFIX;
     private String SECRET;
-
-
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager, SecurityUtil securityUtil,
                                   UserRepository userRepository) {
