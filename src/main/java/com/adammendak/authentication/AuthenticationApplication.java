@@ -12,10 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SpringBootApplication
 public class AuthenticationApplication {
 
-
-    //todo WERSJA 2.0 z rsa public key tokenem
-    //todo implement token expired in user i inne bajery
-
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
